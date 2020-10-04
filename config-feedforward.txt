@@ -1,3 +1,5 @@
+# Mostly copied from https://github.com/techwithtim/NEAT-Flappy-Bird/blob/master/config-feedforward.txt
+
 [NEAT]
 fitness_criterion     = max
 fitness_threshold     = 70
