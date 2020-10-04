@@ -13,7 +13,7 @@ class TicTacToe():
     
     def __init__(self):
         
-        self.player_turn = np.random.choice([1,-1])
+        self.player_turn = 1#np.random.choice([1,-1])
         self.state = np.zeros((3,3),dtype=int)
         self.finished = False
         self.player_won = 0
@@ -28,11 +28,11 @@ class TicTacToe():
         else:
             if self.state[row,col] == 0:
                 self.state[row,col] = self.player_turn
-            self.player_turn = -1 if self.player_turn == 1 else 1
+                self.player_turn = -1 if self.player_turn == 1 else 1
             
-            self.check_win()
-            if not self.finished:
-                self.check_full()
+                self.check_win()
+                if not self.finished:
+                    self.check_full()
 
 
     def check_win(self):
@@ -159,22 +159,21 @@ class TicTacToe_surface():
                     
         if info is not None:
             draw_text(self.win, info, xy=(self.centx[1,1], self.centy[1,1]-self.yrng/9), color='black')
-                    
-        
+
             
     def clicked(self, pos):
         posx, posy= pos
             
-        if posx < self.xl1:
+        if posx < self.vl1[0][0]:
             col = 0
-        elif posx > self.xl2:
+        elif posx > self.vl2[0][0]:
             col = 2
         else:
             col = 1
             
-        if posy < self.yl1:
+        if posy < self.hl1[0][1]:
             row = 0
-        elif posy > self.yl2:
+        elif posy > self.hl2[0][1]:
             row = 2
         else:
             row = 1
@@ -193,11 +192,19 @@ class TicTacToe_2players():
         
     def action(self):
         ntrials = 0
+        
         if not self.ttt.finished:
             if self.ttt.player_turn == 1:
-                ntrials = self.player1.action(self.ttt)
+                active_player = self.player1
+            elif self.ttt.player_turn == -1:
+                active_player = self.player2
             else:
-                ntrials = self.player2.action(self.ttt)
+                raise ValueError()
+                
+            if active_player.auto:
+                ntrials = active_player.action(self.ttt)
+            else:
+                ntrials = active_player.action(self.surface)
                 
         return ntrials
                 

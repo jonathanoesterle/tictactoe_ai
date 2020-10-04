@@ -6,11 +6,36 @@ Created on Sun Oct  4 14:19:09 2020
 """
 
 import numpy as np
+import pygame
+from utils import game_exit
 
-class RandomPlayer():
+class Player():
+    def __init__(self):
+        self.auto = True
+
+class HumanPlayer(Player):
     
     def __init__(self):
-        pass
+        self.auto = False
+    
+    @staticmethod
+    def action(surface):
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    game_exit()
+    
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if pygame.mouse.get_pressed()[0]: # check for left click.
+                        pos = pygame.mouse.get_pos() # check click pos                 
+                        print(f'clicked at {pos}')
+                        surface.clicked(pos)
+                        return 0
+
+class RandomPlayer(Player):
+    
+    def __init__(self):
+        self.auto = True
     
     @staticmethod
     def action(tictactoe):
@@ -31,6 +56,7 @@ class RandomPlayer():
 class AIPlayer():
     
     def __init__(self, net):
+        self.auto = True
         self.net = net
     
     def action(self, tictactoe):

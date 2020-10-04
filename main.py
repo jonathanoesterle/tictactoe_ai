@@ -13,7 +13,7 @@ import neat
 
 from tictactoe import TicTacToe_2players
 from utils import game_exit
-from players import RandomPlayer, AIPlayer
+from players import RandomPlayer, AIPlayer, HumanPlayer
 
 pygame.font.init()  # init font
       
@@ -30,31 +30,26 @@ def game_loop(player1=None, player2=None):
     winw = 400
     winh = 400
     win = pygame.display.set_mode((winw, winh))
-    
 
     game = TicTacToe_2players(win, player1, player2)
     
-    while True: 
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_exit()
-
-            # elif event.type == pygame.MOUSEBUTTONDOWN:
-            #     if pygame.mouse.get_pressed()[0]: # check for left click.
-            #         pos = pygame.mouse.get_pos() # check click pos                 
-            #         print(f'clicked at {pos}')
-            #         game.clicked(pos)
         
-        game.action()  
-        
-        win.fill((255,255,255))                
-        game.draw(f'1:{game.ttt.n1won}, 2:{game.ttt.n1won}, T:{game.ttt.nties}')
+        win.fill((255,255,255))
+        game.draw(f'1:{game.ttt.n1won}, 2:{game.ttt.n2won}, T:{game.ttt.nties}')
         pygame.display.update()
         clock.tick(2)
         
         if game.ttt.finished:               
+            time.sleep(1)
             game.ttt.reset()
-            time.sleep(2)
+            
+        else:
+            game.action()
+
 
 def eval_genomes(genomes, config):
     
@@ -62,6 +57,7 @@ def eval_genomes(genomes, config):
     
     winw = 800
     winh = 800
+    max_rounds = 25
     
     plt_max = 0
     plt_max_x = 0
@@ -82,7 +78,7 @@ def eval_genomes(genomes, config):
     nxplot = np.min([plt_max_x, int(np.ceil(np.sqrt(n_genomes)))])
     
     for idx, (genome_id, genome) in enumerate(genomes):
-        genome.fitness = 0
+        genome.fitness = 10
         ge.append(genome)
         
         if idx < plt_max:
@@ -106,7 +102,6 @@ def eval_genomes(genomes, config):
     run = True
     
     playing_idx = np.ones(len(games), dtype=bool)
-    max_rounds = 40
     played_rounds = np.zeros(len(games), dtype=int)
     paused_turns = np.zeros(len(games), dtype=int)
 
@@ -178,9 +173,8 @@ def train_AI(ngens=10):
 print('go!')
 
 opponent_player = RandomPlayer()
-
-for i in range(3):
-    winner = train_AI(ngens=4+i*2)
+for i in range(1):
+    winner = train_AI(ngens=20)
     opponent_player = AIPlayer(neat.nn.FeedForwardNetwork.create(winner, config))
 
 player1 = AIPlayer(neat.nn.FeedForwardNetwork.create(winner, config))
