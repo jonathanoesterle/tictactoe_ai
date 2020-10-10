@@ -4,6 +4,7 @@ Created on Sun Oct  4 14:16:20 2020
 
 @author: joesterle
 """
+import itertools
 
 import numpy as np
 from utils import draw_text, tocolor
@@ -13,27 +14,25 @@ class TicTacToe():
     
     def __init__(self):
         
-        self.player_turn = 1#np.random.choice([1,-1])
-        self.state = np.zeros((3,3),dtype=int)
+        self.player_turn = np.random.choice([1, -1])
+        self.state = np.zeros((3, 3), dtype=int)
         self.finished = False
         self.player_won = 0
         self.nties = 0
         self.n1won = 0
         self.n2won = 0
-                
-    
+
     def clicked(self, row, col):
         if self.finished:
             self.reset()
         else:
-            if self.state[row,col] == 0:
-                self.state[row,col] = self.player_turn
+            if self.state[row, col] == 0:
+                self.state[row, col] = self.player_turn
                 self.player_turn = -1 if self.player_turn == 1 else 1
             
                 self.check_win()
                 if not self.finished:
                     self.check_full()
-
 
     def check_win(self):
         
@@ -45,18 +44,17 @@ class TicTacToe():
                 return False
         
         for idx in range(3):
-            if row_complete(self.state[idx,:]):
+            if row_complete(self.state[idx, :]):
                 self.finished = True
-                self.player_won = self.state[idx,0]
+                self.player_won = self.state[idx, 0]
 
-            if row_complete(self.state[:,idx]):
+            if row_complete(self.state[:, idx]):
                 self.finished = True
-                self.player_won = self.state[0,idx]
-              
-            
+                self.player_won = self.state[0, idx]
+
         if row_complete(np.diag(np.rot90(self.state))) or row_complete(np.diag(self.state)):
             self.finished = True
-            self.player_won = self.state[1,1]
+            self.player_won = self.state[1, 1]
         
         if self.finished:
             if self.player_won == 1:
@@ -65,8 +63,7 @@ class TicTacToe():
                 self.n2won += 1
             else:
                 raise ValueError(self.player_won)
-        
-        
+
     def check_full(self):
         if np.all(self.state != 0):
             self.finished = True
@@ -76,7 +73,8 @@ class TicTacToe():
         self.state[:] = 0
         self.finished = False
         self.player_won = 0
-        self.player_turn = np.random.choice([1,-1])
+        self.player_turn = np.random.choice([1, -1])
+
 
 class TicTacToe_surface():
     
@@ -121,7 +119,6 @@ class TicTacToe_surface():
             self.hl4 = ((x0, y1), (x1, y1))
             
             self.lc = (0,0,0)
-            
     
             xdist = np.linspace(x0+xrng/6, x0+xrng*5/6, 3)
             ydist = np.linspace(y0+yrng/6, y0+yrng*5/6, 3)        
@@ -130,7 +127,6 @@ class TicTacToe_surface():
     def draw(self, info=None):
         
         if self.win is None: return
-        
             
         ntotal = self.ttt.n1won+ self.ttt.n2won + self.ttt.nties
         
@@ -141,28 +137,24 @@ class TicTacToe_surface():
             self.win.fill(tocolor('gray'), (self.x0, self.y0, self.xrng, self.yrng))
             self.win.fill(tocolor('indianred'), (self.x0, self.y1-yfrac1*self.yrng, self.xrng, yfrac1*self.yrng))
             self.win.fill(tocolor('cyan'), (self.x0, self.y0, self.xrng, yfrac2*self.yrng))
-            
-        
+
         for (l_start, l_end) in [self.vl1, self.vl2, self.hl1, self.hl2]:
             pygame.draw.line(self.win, self.lc, l_start, l_end, 2)
             
         for (l_start, l_end) in [self.hl3, self.hl4, self.vl3, self.vl4]:
             pygame.draw.line(self.win, self.lc, l_start, l_end, 6)
-        
-        
-        for i in range(3):
-            for j in range(3):
-                if self.ttt.state[i,j] != 0:
-                    mark = 'X' if self.ttt.state[i,j] == 1 else 'O'
-                    color = 'darkred' if self.ttt.state[i,j] == 1 else 'blue'
-                    draw_text(self.win, mark, xy=(self.centx[i,j],self.centy[i,j]), color=color)
+
+        for row, col in itertools.product(range(3), range(3)):
+            if self.ttt.state[row, col] != 0:
+                mark = 'X' if self.ttt.state[row,col] == 1 else 'O'
+                color = 'darkred' if self.ttt.state[row, col] == 1 else 'blue'
+                draw_text(self.win, mark, xy=(self.centx[row, col],self.centy[row, col]), color=color)
                     
         if info is not None:
             draw_text(self.win, info, xy=(self.centx[1,1], self.centy[1,1]-self.yrng/9), color='black')
 
-            
     def clicked(self, pos):
-        posx, posy= pos
+        posx, posy = pos
             
         if posx < self.vl1[0][0]:
             col = 0
@@ -189,7 +181,6 @@ class TicTacToe_2players():
         self.player1 = player1
         self.player2 = player2
 
-        
     def action(self):
         ntrials = 0
         
@@ -210,7 +201,6 @@ class TicTacToe_2players():
                 
     def draw(self, info=None):
         self.surface.draw(info=info)
-        
 
     def clicked(self, pos):
         self.surface.clicked(pos)
